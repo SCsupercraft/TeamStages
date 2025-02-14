@@ -1,0 +1,12 @@
+{
+  "ftbquests.reward.teamstages.change_stage": "Stage (TeamStages)",
+  "teamstages.quests.rewards.stage.altTitle": "Stage: %s",
+  "teamstages.quests.rewards.stage.stage": "Stage",
+  "teamstages.quests.rewards.stage.effect": "Effect",
+  "teamstages.quests.rewards.stage.remove": "Should remove stage",
+
+  "ftbquests.task.teamstages.has_stage": "Stage (TeamStages)",
+  "teamstages.quests.tasks.stage.altTitle": "Stage: %s",
+  "teamstages.quests.tasks.stage.stage": "Stage",
+  "teamstages.quests.tasks.stage.effect": "Effect"
+}
