@@ -28,7 +28,7 @@ The stage reward has 3 settings, stage, effect, and remove.
 
 ### Getting Started
 
-To start using the Team Stages APU in your mod add the following to your build script (`build.gradle`):
+To start using the Team Stages API in your mod add the following to your build script (`build.gradle`):
 
 #### Repositories
 
