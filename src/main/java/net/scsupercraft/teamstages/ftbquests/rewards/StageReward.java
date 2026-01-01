@@ -13,8 +13,9 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.scsupercraft.teamstages.TeamStageHelper;
-import net.scsupercraft.teamstages.data.PlayerStageData;
+import net.scsupercraft.teamstages.data.IGameStageData;
+import net.scsupercraft.teamstages.data.TeamStageHelper;
+import net.scsupercraft.teamstages.data.TeamStageSaveHandler;
 import net.scsupercraft.teamstages.ftbquests.Rewards;
 import net.scsupercraft.teamstages.util.GameStageEffect;
 
@@ -55,14 +56,16 @@ public class StageReward extends Reward {
 
 	@Override
 	public void claim(ServerPlayer player, boolean notify) {
-		PlayerStageData data = TeamStageHelper.getPlayerData(player);
+		IGameStageData data = TeamStageSaveHandler.getGameDataForPlayer(player.getUUID());
 		if (data == null) return;
 
 		if (remove) {
-			data.removeStage(stage, true, effect);
+			data.removeStage(stage, effect);
 		} else {
-			data.addStage(stage, true, effect);
+			data.addStage(stage, effect);
 		}
+
+        TeamStageHelper.syncPlayer(player);
 
 		if (!notify) return;
 		if (remove) {

@@ -93,9 +93,9 @@ dependencies {
 
     implementation fg.deobf("curse.maven:game-stages-268655:${gamestages_file_id}")
 
-    implementation fg.deobf("curse.maven:ftb-library-forge-404465:6016763")
-    implementation fg.deobf("curse.maven:ftb-teams-forge-404468:5267190")
-    implementation fg.deobf("curse.maven:ftb-quests-forge-289412:5816794")
+    implementation fg.deobf("curse.maven:ftb-library-forge-404465:6807424")
+    implementation fg.deobf("curse.maven:ftb-teams-forge-404468:6130786")
+    implementation fg.deobf("curse.maven:ftb-quests-forge-289412:7260736")
 }
 
 mixin {
@@ -156,7 +156,7 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/mcmodsrepo"
+            url "file://D:/GitHub/maven.scsupercraft.dev"
         }
     }
 }

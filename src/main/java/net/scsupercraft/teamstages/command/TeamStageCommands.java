@@ -7,7 +7,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.ftb.mods.ftbteams.api.Team;
 import dev.ftb.mods.ftbteams.data.TeamArgument;
@@ -18,33 +17,24 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.scsupercraft.teamstages.TeamStageHelper;
-import net.scsupercraft.teamstages.data.PlayerStageData;
-import net.scsupercraft.teamstages.data.TeamStageData;
+import net.scsupercraft.teamstages.data.TeamStageHelper;
 import net.scsupercraft.teamstages.util.FtbUtil;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class TeamStageCommands {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		for (CommandNode<CommandSourceStack> node : dispatcher.getRoot().getChildren()) {
-			if (node.getName().equals("gamestage")) {
-				// Register the alias command
-				dispatcher.register(Commands.literal("gs").redirect(node));
-				break;
-			}
-		}
-
 		LiteralArgumentBuilder<CommandSourceStack> commandLiteral = Commands.literal("teamstage");
 
-		commandLiteral.then(createCommands("player", false));
-		commandLiteral.then(createCommands("team", true));
+		commandLiteral.then(createCommands(false));
+		commandLiteral.then(createCommands(true));
 
 		LiteralCommandNode<CommandSourceStack> command = dispatcher.register(commandLiteral);
 
 		dispatcher.register(Commands.literal("ts")
 				.redirect(command));
+        dispatcher.register(Commands.literal("gs")
+                .redirect(dispatcher.getRoot().getChild("gamestage")));
 	}
 
 	private static LiteralArgumentBuilder<CommandSourceStack> createCommand(String key, int permissions, boolean forTeam, Command<CommandSourceStack> command, Command<CommandSourceStack> commandNoPlayer) {
@@ -79,8 +69,8 @@ public class TeamStageCommands {
 		);
 	}
 
-	private static LiteralArgumentBuilder<CommandSourceStack> createCommands(String key, boolean forTeam) {
-		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal(key);
+	private static LiteralArgumentBuilder<CommandSourceStack> createCommands(boolean forTeam) {
+		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal(forTeam ? "team" : "player");
 
 		command.then(createSilentStageCommand("add", 2, forTeam,
 				(ctx) -> changeStages(ctx, true, false, forTeam),
@@ -120,10 +110,11 @@ public class TeamStageCommands {
 
 		if (forTeam) {
 			Team team = hasTarget ? TeamArgument.get(context, "target") : FtbUtil.getTeam(source.getPlayerOrException());
-			TeamStageData data = TeamStageHelper.getTeamData(team);
+            TeamStageHelper.TeamHelper helper = TeamStageHelper.team();
+            IStageData data = helper.getTeamData(team);
 
-			if (data == null) return 1;
-			TeamStageHelper.addTeamStage(team, TeamStageHelper.getKnownStages().toArray(new String[0]));
+			if (team == null || data == null) return 1;
+			helper.addStage(team, TeamStageHelper.getKnownStages().toArray(new String[0]));
 
 			for (ServerPlayer player : team.getOnlineMembers()) {
 				player.displayClientMessage(Component.translatable("commands.gamestage.all.target"), false);
@@ -133,10 +124,11 @@ public class TeamStageCommands {
 			}
 		} else {
 			ServerPlayer player = hasTarget ? EntityArgument.getPlayer(context, "target") : source.getPlayerOrException();
-			PlayerStageData data = TeamStageHelper.getPlayerData(player);
+            TeamStageHelper.PlayerHelper helper = TeamStageHelper.player();
+            IStageData data = helper.getPlayerData(player);
 
 			if (data == null) return 1;
-			TeamStageHelper.addPlayerStage(player, TeamStageHelper.getKnownStages().toArray(new String[0]));
+			helper.addStage(player, TeamStageHelper.getKnownStages().toArray(new String[0]));
 
 			player.displayClientMessage(Component.translatable("commands.gamestage.all.target"), false);
 			if (player != source.getEntity()) {
@@ -153,15 +145,15 @@ public class TeamStageCommands {
 
 		if (forTeam) {
 			Team team = hasTarget ? TeamArgument.get(context, "target") : FtbUtil.getTeam(source.getPlayerOrException());
-			if (team == null) return 1;
+            if (team == null) return 1;
 
-			boolean hasStage = TeamStageHelper.teamHasStage(team, stage);
+			boolean hasStage = TeamStageHelper.team().hasStage(team, stage);
 
 			source.sendSuccess(() -> Component.translatable(hasStage ? "commands.gamestage.check.success" : "commands.gamestage.check.failure", team.getShortName(), stage), false);
 			return hasStage ? 1 : 0;
 		} else {
 			ServerPlayer player = hasTarget ? EntityArgument.getPlayer(context, "target") : source.getPlayerOrException();
-			boolean hasStage = TeamStageHelper.playerHasStage(player, stage);
+			boolean hasStage = TeamStageHelper.player().hasStage(player, stage);
 
 			source.sendSuccess(() -> Component.translatable(hasStage ? "commands.gamestage.check.success" : "commands.gamestage.check.failure", player.getDisplayName(), stage), false);
 			return hasStage ? 1 : 0;
@@ -175,7 +167,7 @@ public class TeamStageCommands {
 			Team team = hasTarget ? TeamArgument.get(context, "target") : FtbUtil.getTeam(source.getPlayerOrException());
 			if (team == null) return 1;
 
-			int removedStages = TeamStageHelper.clearTeamStages(team);
+			int removedStages = TeamStageHelper.team().clearStages(team);
 
 			for (ServerPlayer player : team.getOnlineMembers()) {
 				player.displayClientMessage(Component.translatable("commands.gamestage.clear.target", removedStages), false);
@@ -185,7 +177,7 @@ public class TeamStageCommands {
 			}
 		} else {
 			ServerPlayer player = hasTarget ? EntityArgument.getPlayer(context, "target") : source.getPlayerOrException();
-			int removedStages = TeamStageHelper.clearPlayerStages(player);
+			int removedStages = TeamStageHelper.player().clearStages(player);
 
 			player.displayClientMessage(Component.translatable("commands.gamestage.clear.target", removedStages), false);
 			if (player != source.getEntity()) {
@@ -204,28 +196,23 @@ public class TeamStageCommands {
 
 		if (forTeam) {
 			Team team = hasTarget ? TeamArgument.get(context, "target") : FtbUtil.getTeam(source.getPlayerOrException());
-			data = TeamStageHelper.getTeamData(team);
-			infoOwner = team != null ? team.getShortName() : "unknown";
+			data = TeamStageHelper.team().getTeamData(team);
+			infoOwner = team != null
+                    ? team.getShortName()
+                    : "unknown";
 		} else {
 			ServerPlayer player = hasTarget ? EntityArgument.getPlayer(context, "target") : source.getPlayerOrException();
-			data = TeamStageHelper.getPlayerData(player);
+			data = TeamStageHelper.player().getPlayerData(player);
 			infoOwner = player.getScoreboardName();
 		}
 
-		if (data == null) {
+		if (data == null || data.getStages().isEmpty()) {
 			source.sendSuccess(() -> Component.translatable("commands.gamestage.info.empty", infoOwner), false);
 			return 1;
 		}
 
-		Collection<String> stages = data instanceof PlayerStageData playerStageData ? playerStageData.getPlayerStages() : data.getStages();
-		String stageInfo = stages.stream().map(Object::toString).collect(Collectors.joining(", "));
-
-		if (stageInfo.isEmpty()) {
-			source.sendSuccess(() -> Component.translatable("commands.gamestage.info.empty", infoOwner), false);
-		} else {
-			source.sendSuccess(() -> Component.translatable("commands.gamestage.info.stages", infoOwner, stageInfo), false);
-		}
-
+		String stageInfo = data.getStages().stream().map(Object::toString).collect(Collectors.joining(", "));
+        source.sendSuccess(() -> Component.translatable("commands.gamestage.info.stages", infoOwner, stageInfo), false);
 		return 1;
 	}
 
@@ -236,10 +223,12 @@ public class TeamStageCommands {
 
 		if (forTeam) {
 			Team team = TeamArgument.get(context, "target");
-			TeamStageData data = TeamStageHelper.getTeamData(team);
+            TeamStageHelper.TeamHelper helper = TeamStageHelper.team();
 
-			if (data == null || adding == data.hasStage(stage)) return 1;
-			if (adding) { data.addStage(stage); } else { data.removeStage(stage); }
+			if (helper.getTeamData(team) == null || adding == helper.hasStage(team, stage)) return 1;
+
+			if (adding) helper.addStage(team, stage);
+            else helper.removeStage(team, stage);
 
 			if (silent) return 1;
 
@@ -251,10 +240,12 @@ public class TeamStageCommands {
 			}
 		} else {
 			ServerPlayer player = EntityArgument.getPlayer(context, "target");
-			PlayerStageData data = TeamStageHelper.getPlayerData(player);
+            TeamStageHelper.PlayerHelper helper = TeamStageHelper.player();
 
-			if (data == null || adding == data.playerHasStage(stage)) return 1;
-			if (adding) { data.addPlayerStage(stage); } else { data.removePlayerStage(stage); }
+			if (helper.getPlayerData(player) == null || adding == helper.hasStage(player, stage)) return 1;
+
+			if (adding) helper.addStage(player, stage);
+            else helper.removeStage(player, stage);
 
 			if (silent) return 1;
 

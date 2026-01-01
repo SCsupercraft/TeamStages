@@ -9,8 +9,8 @@ import net.scsupercraft.teamstages.ftbquests.tasks.StageTask;
 
 public class Tasks {
 	static void register() {
-		Stage = TaskTypes.register(new ResourceLocation(TeamStages.MOD_ID, "has_stage"), StageTask::new, () -> Icons.CONTROLLER);
-	}
+        Stage = TaskTypes.register(new ResourceLocation(TeamStages.MOD_ID, "has_stage"), StageTask::new, () -> Icons.CONTROLLER);
+    }
 
 	public static TaskType Stage;
 }

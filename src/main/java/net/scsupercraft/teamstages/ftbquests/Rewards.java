@@ -9,8 +9,8 @@ import net.scsupercraft.teamstages.ftbquests.rewards.StageReward;
 
 public class Rewards {
 	static void register() {
-		Stage = RewardTypes.register(new ResourceLocation(TeamStages.MOD_ID, "change_stage"), StageReward::new, () -> Icons.CONTROLLER);
-	}
+        Stage = RewardTypes.register(new ResourceLocation(TeamStages.MOD_ID, "change_stage"), StageReward::new, () -> Icons.CONTROLLER);
+    }
 
 	public static RewardType Stage;
 }

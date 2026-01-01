@@ -1,7 +1,7 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
-#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
+issueTrackerURL="https://github.com/SCsupercraft/TeamStages/issues"
 
 [[mods]]
 modId="${mod_id}"
@@ -9,7 +9,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 # A URL to query for updates for this mod. See the JSON tryComplete specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
 #updateJSONURL="https://change.me.example.invalid/updates.json"
-#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
+displayURL="https://github.com/SCsupercraft/TeamStages"
 logoFile="logo.png"
 authors="${mod_authors}"
 

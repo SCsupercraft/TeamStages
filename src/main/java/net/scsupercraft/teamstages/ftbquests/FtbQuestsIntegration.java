@@ -1,21 +1,22 @@
 package net.scsupercraft.teamstages.ftbquests;
 
 public class FtbQuestsIntegration {
-	public static boolean enabled = false;
+	public static final boolean ENABLED;
+
 	static {
+        boolean installed = true;
 		try {
 			Class.forName("dev.ftb.mods.ftbquests.quest.task.TaskType");
-			enabled = true;
 		} catch (ClassNotFoundException e) {
-			enabled = false;
+			installed = false;
 		}
+        ENABLED = installed;
 	}
 
 	public static void init() {
-		if (!enabled) return;
+		if (!ENABLED) return;
 
 		Tasks.register();
 		Rewards.register();
 	}
 }
-

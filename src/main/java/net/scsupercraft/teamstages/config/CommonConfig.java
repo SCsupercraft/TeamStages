@@ -13,8 +13,8 @@ public class CommonConfig {
 
 	private static final ForgeConfigSpec.EnumValue<GameStageEffect> CHANGE_EFFECT = BUILDER
 			.comment("Changes who stages are granted to when using the gamestages api")
-			.comment("Changes who's stages are removed when using the gamestages api")
-			.defineEnum("change", GameStageEffect.PLAYER);
+			.comment("Changes who stages are removed from when using the gamestages api")
+			.defineEnum("change", GameStageEffect.TEAM);
 	private static final ForgeConfigSpec.EnumValue<GameStageEffect> CHECK_EFFECT = BUILDER
 			.comment("Changes who's stages are checked when using the gamestages api")
 			.defineEnum("check", GameStageEffect.BOTH);
