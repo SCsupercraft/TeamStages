@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * An implementation of {@link IStageData} that doesn't hold any stages.
+ */
 public class EmptyStageData implements IStageData {
     @Override
     public Collection<String> getStages() {

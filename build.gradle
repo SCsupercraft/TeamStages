@@ -25,6 +25,14 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+java.withSourcesJar()
+java.withJavadocJar()
+
+javadoc {
+    include 'dev/scsupercraft/teamstages/data/**'
+    include 'dev/scsupercraft/teamstages/event/**'
+}
+
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
@@ -83,6 +91,9 @@ repositories {
         name = 'Architectury'
         url = 'https://maven.architectury.dev'
     }
+    maven {
+        url 'https://maven.blamejared.com'
+    }
 }
 
 dependencies {
@@ -91,7 +102,7 @@ dependencies {
 
     implementation fg.deobf("dev.architectury:architectury-forge:${architectury_api_version}")
 
-    implementation fg.deobf("curse.maven:game-stages-268655:${gamestages_file_id}")
+    implementation fg.deobf("net.darkhax.gamestages:GameStages-Forge-${minecraft_version}:${gamestages_version}")
 
     implementation fg.deobf("curse.maven:ftb-library-forge-404465:6807424")
     implementation fg.deobf("curse.maven:ftb-teams-forge-404468:6130786")
@@ -151,7 +162,8 @@ tasks.named('jar', Jar).configure {
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
-            artifact jar
+            artifactId = base.archivesName.get()
+            from components.java
         }
     }
     repositories {

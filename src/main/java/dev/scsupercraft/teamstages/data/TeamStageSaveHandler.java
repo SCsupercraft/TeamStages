@@ -18,6 +18,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import dev.scsupercraft.teamstages.TeamStages;
 import dev.scsupercraft.teamstages.util.FtbUtil;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -25,17 +26,30 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * The class responsible for saving and loading team stages.
+ */
 public class TeamStageSaveHandler {
 	private static boolean loaded = false;
 	private static final Map<UUID, IStageData> GLOBAL_STAGE_DATA = new HashMap<>();
     private static Map<UUID, IStageData> GLOBAL_PLAYER_STAGE_DATA = Collections.emptyMap();
 
+    /**
+     * DO NOT USE
+     * @param stageData the new map for storing global player stage data
+     */
+    @ApiStatus.Internal
     public static void setGlobalPlayerStageData(Map<UUID, IStageData> stageData) {
         if (GLOBAL_PLAYER_STAGE_DATA != Collections.EMPTY_MAP) throw new IllegalStateException(
                 "Attempted to set global player stage data, but it was already set");
         GLOBAL_PLAYER_STAGE_DATA = stageData;
     }
 
+    /**
+     * DO NOT USE
+     * @throws ClassNotFoundException if game stages is not installed
+     */
+    @ApiStatus.Internal
     public static void init() throws ClassNotFoundException {
         Class.forName("net.darkhax.gamestages.data.GameStageSaveHandler");
 
@@ -76,6 +90,14 @@ public class TeamStageSaveHandler {
             TeamStages.LOGGER.warn("Failed to delete file: {}", file);
     }
 
+    /**
+     * Hook for the player LoadFromFile event. Allows game stage data to be loaded when the player's data is loaded.
+     *
+     * @param playerFile the file where the player's data is stored
+     * @param uuid       the player's UUID
+     * @param name       a component holding the player's display name
+     */
+    @ApiStatus.Internal
     public static void onPlayerLoad(File playerFile, UUID uuid, Component name) {
         GameStageData stageData = new GameStageData();
         if (playerFile.exists()) {
@@ -99,6 +121,10 @@ public class TeamStageSaveHandler {
         GLOBAL_PLAYER_STAGE_DATA.put(uuid, stageData);
     }
 
+    /**
+     * Saves all team stage data.
+     */
+    @ApiStatus.Internal
 	public static void save() {
         createSaveDirectory();
 		GLOBAL_STAGE_DATA.forEach(TeamStageSaveHandler::save);
@@ -114,6 +140,10 @@ public class TeamStageSaveHandler {
 		}
 	}
 
+    /**
+     * Loads all team stage data.
+     */
+    @ApiStatus.Internal
 	public static void load() {
 		if (loaded) return;
 
@@ -161,11 +191,15 @@ public class TeamStageSaveHandler {
 		}
 	}
 
+    /**
+     * Lets the save handler know that the data needs loading from the disk.
+     */
+    @ApiStatus.Internal
 	public static void markUnloaded() {
 		loaded = false;
 	}
 
-	public static void registerAllTeams() {
+	private static void registerAllTeams() {
 		TeamManager manager = FtbUtil.getTeamManager();
 		if (manager == null) return;
 
@@ -185,7 +219,7 @@ public class TeamStageSaveHandler {
 		GLOBAL_STAGE_DATA.put(uuid, new StageData());
 	}
 
-	public static void copyTeamData(UUID srcTeamId, UUID destTeamId) {
+	private static void copyTeamData(UUID srcTeamId, UUID destTeamId) {
 		IStageData stageData = new StageData();
 		IStageData srcData = getTeamData(srcTeamId);
 
@@ -197,23 +231,48 @@ public class TeamStageSaveHandler {
 		GLOBAL_STAGE_DATA.put(destTeamId, stageData);
 	}
 
+    /**
+     * Gets the stage data for the team with the provided UUID.
+     *
+     * @param uuid the team's UUID
+     * @return the stage data
+     */
 	@Nullable
 	public static IStageData getTeamData(UUID uuid) {
 		return GLOBAL_STAGE_DATA.get(uuid);
 	}
 
+
+    /**
+     * Gets the team stage data for the player with the provided UUID.
+     *
+     * @param uuid the player's UUID
+     * @return the stage data
+     */
     @Nullable
     public static IStageData getTeamDataForPlayer(UUID uuid) {
         GameStageData data = (GameStageData) GLOBAL_PLAYER_STAGE_DATA.get(uuid);
         return data != null ? data.teamStageData : null;
     }
 
+    /**
+     * Gets the player stage data for the player with the provided UUID.
+     *
+     * @param uuid the player's UUID
+     * @return the stage data
+     */
     @Nullable
     public static IStageData getPlayerData(UUID uuid) {
         GameStageData data = (GameStageData) GLOBAL_PLAYER_STAGE_DATA.get(uuid);
         return data != null ? data.playerStageData : null;
     }
 
+    /**
+     * Gets the game stage data for the player with the provided UUID.
+     *
+     * @param uuid the player's UUID
+     * @return the stage data
+     */
     public static IGameStageData getGameDataForPlayer(UUID uuid) {
         return ((IGameStageData) GLOBAL_PLAYER_STAGE_DATA.get(uuid));
     }
@@ -234,8 +293,15 @@ public class TeamStageSaveHandler {
         return saveDir;
     }
 
+    /**
+     * Sets the client's synced stage data.
+     *
+     * @param player the player stage data for the client
+     * @param team   the team stage data for the client
+     */
     public static void setClientData(Collection<String> player, Collection<String> team) {
         GameStageData stageData = new GameStageData();
+        stageData.teamStageData = new StageData();
 
         for (String stage : player) {
             stageData.playerStageData.addStage(stage);
@@ -248,13 +314,23 @@ public class TeamStageSaveHandler {
         GameStageSaveHandler.setClientData(stageData);
     }
 
-	@OnlyIn(Dist.CLIENT)
+    /**
+     * Gets the player stage data of the current player that has been synced to the client.
+     *
+     * @return the current client side stage data
+     */
+    @OnlyIn(Dist.CLIENT)
 	public static IStageData getClientPlayerData() {
 		return GameStageSaveHandler.getClientData() instanceof GameStageData data
                 ? data.playerStageData
                 : null;
 	}
 
+    /**
+     * Gets the team stage data of the current player that has been synced to the client.
+     *
+     * @return the current client side stage data
+     */
     @OnlyIn(Dist.CLIENT)
     public static IStageData getClientTeamData() {
         return GameStageSaveHandler.getClientData() instanceof GameStageData data

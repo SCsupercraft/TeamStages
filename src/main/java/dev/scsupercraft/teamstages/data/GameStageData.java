@@ -11,7 +11,7 @@ import java.util.*;
 
 class GameStageData implements IGameStageData {
     final IStageData playerStageData = new StageData();
-    @NotNull IStageData teamStageData = new StageData();
+    @NotNull IStageData teamStageData = new EmptyStageData();
 
     @Override
     public Collection<String> getStages() {
