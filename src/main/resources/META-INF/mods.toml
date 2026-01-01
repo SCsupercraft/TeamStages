@@ -12,7 +12,6 @@ displayName="${mod_name}"
 displayURL="https://github.com/SCsupercraft/TeamStages"
 logoFile="logo.png"
 authors="${mod_authors}"
-
 description='''${mod_description}'''
 
 [[dependencies.${mod_id}]]
@@ -30,29 +29,29 @@ description='''${mod_description}'''
     side="BOTH"
 
 [[dependencies.${mod_id}]]
-modId = "architectury"
-mandatory = true
-versionRange = "${architectury_api_version_range}"
-ordering = "AFTER"
-side = "BOTH"
+    modId = "architectury"
+    mandatory = true
+    versionRange = "${architectury_api_version_range}"
+    ordering = "AFTER"
+    side = "BOTH"
 
 [[dependencies.${mod_id}]]
-modId="gamestages"
-mandatory=true
-versionRange="${gamestages_version_range}"
-ordering="AFTER"
-side="BOTH"
+    modId="gamestages"
+    mandatory=true
+    versionRange="${gamestages_version_range}"
+    ordering="AFTER"
+    side="BOTH"
 
 [[dependencies.${mod_id}]]
-modId="ftbteams"
-mandatory=true
-versionRange="${ftbteams_version_range}"
-ordering="AFTER"
-side="BOTH"
+    modId="ftbteams"
+    mandatory=true
+    versionRange="${ftbteams_version_range}"
+    ordering="AFTER"
+    side="BOTH"
 
 [[dependencies.${mod_id}]]
-modId="ftbquests"
-mandatory=false
-versionRange="${ftbquests_version_range}"
-ordering="AFTER"
-side="BOTH"
+    modId="ftbquests"
+    mandatory=false
+    versionRange="${ftbquests_version_range}"
+    ordering="AFTER"
+    side="BOTH"

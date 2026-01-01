@@ -2,7 +2,7 @@
   "required": true,
   "priority": 1000,
   "minVersion": "0.7",
-  "package": "net.scsupercraft.teamstages.mixin",
+  "package": "dev.scsupercraft.teamstages.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "GameStageHelperMixin",

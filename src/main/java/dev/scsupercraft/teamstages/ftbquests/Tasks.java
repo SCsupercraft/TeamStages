@@ -1,0 +1,16 @@
+package dev.scsupercraft.teamstages.ftbquests;
+
+import dev.ftb.mods.ftblibrary.icon.Icons;
+import dev.ftb.mods.ftbquests.quest.task.TaskType;
+import dev.ftb.mods.ftbquests.quest.task.TaskTypes;
+import net.minecraft.resources.ResourceLocation;
+import dev.scsupercraft.teamstages.TeamStages;
+import dev.scsupercraft.teamstages.ftbquests.tasks.StageTask;
+
+public class Tasks {
+	static void register() {
+        Stage = TaskTypes.register(new ResourceLocation(TeamStages.MOD_ID, "has_stage"), StageTask::new, () -> Icons.CONTROLLER);
+    }
+
+	public static TaskType Stage;
+}
